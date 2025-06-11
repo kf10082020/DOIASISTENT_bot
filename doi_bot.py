@@ -6,7 +6,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
 
 # Заменить на свой токен
-TOKEN = os.getenv("TOKEN") or "ВАШ_ТОКЕН"
+TOKEN = os.getenv("TOKEN") or "7822435522:AAH-ZTQuCCxSr385076vyljKLwO8k5Un3DU"
 
 # Настройка логов
 logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
