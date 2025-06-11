@@ -1,106 +1,108 @@
+
+import os
+import logging
+import re
 import requests
 from bs4 import BeautifulSoup
-import re
+from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
 
-# === ИСТОЧНИКИ МЕТАДАННЫХ ===
+# --- Логирование ---
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+logger = logging.getLogger(__name__)
 
+# --- Метаданные ---
 def fetch_metadata_crossref(doi):
     try:
-        url = f"https://api.crossref.org/works/{doi}"
-        r = requests.get(url, timeout=10)
+        r = requests.get(f"https://api.crossref.org/works/{doi}", timeout=10)
         r.raise_for_status()
         return r.json()["message"]
-    except Exception:
+    except:
         return None
 
 def fetch_metadata_pubmed(doi):
     try:
-        query = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term={doi}&retmode=json"
-        r = requests.get(query, timeout=10)
-        r.raise_for_status()
+        search_url = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term={doi}&retmode=json"
+        r = requests.get(search_url, timeout=10)
         pmid = r.json()["esearchresult"]["idlist"][0]
-
-        fetch = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id={pmid}&retmode=xml"
-        r = requests.get(fetch, timeout=10)
-        soup = BeautifulSoup(r.content, "xml")
+        fetch_url = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id={pmid}&retmode=xml"
+        soup = BeautifulSoup(requests.get(fetch_url).content, "xml")
         return {
             "title": soup.find("ArticleTitle").text,
             "authors": [x.text for x in soup.find_all("LastName")],
             "journal": soup.find("Title").text,
             "issued": soup.find("PubDate").text,
-            "abstract": soup.find("AbstractText").text,
-            "volume": None,
-            "issue": None,
-            "pages": None,
-            "pdf_url": None
+            "abstract": soup.find("AbstractText").text
         }
-    except Exception:
+    except:
         return None
 
 def fetch_metadata_html(doi_url):
     try:
-        headers = {"User-Agent": "Mozilla/5.0"}
-        r = requests.get(doi_url, headers=headers, timeout=10)
-        r.raise_for_status()
+        r = requests.get(doi_url, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
         soup = BeautifulSoup(r.text, "html.parser")
-
-        def meta(name):
-            tag = soup.find("meta", {"name": name})
-            return tag["content"] if tag else None
-
+        meta = lambda name: soup.find("meta", {"name": name})
+        get = lambda name: meta(name)["content"] if meta(name) else None
         return {
-            "title": meta("citation_title"),
-            "authors": meta("citation_author"),
-            "journal": meta("citation_journal_title"),
-            "issued": meta("citation_publication_date"),
-            "volume": meta("citation_volume"),
-            "issue": meta("citation_issue"),
-            "pages": meta("citation_firstpage"),
-            "abstract": meta("description") or meta("citation_abstract"),
-            "pdf_url": meta("citation_pdf_url")
+            "title": get("citation_title"),
+            "authors": get("citation_author"),
+            "journal": get("citation_journal_title"),
+            "issued": get("citation_publication_date"),
+            "volume": get("citation_volume"),
+            "issue": get("citation_issue"),
+            "pages": get("citation_firstpage"),
+            "abstract": get("description"),
+            "pdf_url": get("citation_pdf_url")
         }
-    except Exception:
+    except:
         return None
-
-# === ОБРАБОТЧИК РЕЗУЛЬТАТА ===
 
 def build_reply(data):
     if not data:
         return "❌ Не удалось извлечь метаданные."
-
     authors = ", ".join(data.get("authors", [])) if isinstance(data.get("authors"), list) else data.get("authors", "—")
-
     reply = f"📘 *Название:* {data.get('title', '—')}\n"
-    reply += f"👨‍🔬 *Авторы:* {authors}\n"
+    reply += f"👨\u200d🔬 *Авторы:* {authors}\n"
     reply += f"📅 *Год:* {data.get('issued', '—')}\n"
     reply += f"📚 *Журнал:* {data.get('journal', '—')}\n"
     reply += f"📦 *Том:* {data.get('volume', '—')}\n"
     reply += f"📎 *Выпуск:* {data.get('issue', '—')}\n"
     reply += f"📄 *Страницы:* {data.get('pages', '—')}\n"
     reply += f"\n📝 *Аннотация:*\n{data.get('abstract', 'Нет аннотации')}\n"
-
     if data.get("pdf_url"):
         reply += f"\n📥 *PDF:* [Скачать PDF]({data['pdf_url']})\n"
-
     return reply
 
-# === ОСНОВНАЯ ФУНКЦИЯ ===
+def extract_doi(text):
+    match = re.findall(r"10\.\d{4,9}/[-._;()/:A-Z0-9]+", text, re.I)
+    return match[0] if match else None
 
-def handle_doi(doi_url):
-    doi = re.findall(r"10\.\d{4,9}/[-._;()/:A-Z0-9]+", doi_url, re.I)
+# --- Telegram Handlers ---
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Привет! Отправь мне DOI-ссылку, и я выведу метаданные статьи.")
+
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    text = update.message.text.strip()
+    doi = extract_doi(text)
     if not doi:
-        return "❌ DOI не распознан."
-    doi = doi[0]
+        await update.message.reply_text("❌ DOI не найден. Отправь корректную ссылку.")
+        return
 
-    for fetcher in [fetch_metadata_crossref, fetch_metadata_pubmed, fetch_metadata_html]:
-        data = fetcher(doi if fetcher != fetch_metadata_html else doi_url)
-        if data:
-            return build_reply(data)
+    doi_url = f"https://doi.org/{doi}"
+    data = fetch_metadata_crossref(doi) or fetch_metadata_pubmed(doi) or fetch_metadata_html(doi_url)
+    reply = build_reply(data)
+    await update.message.reply_markdown(reply, disable_web_page_preview=True)
 
-    return "❌ Не удалось найти публикацию по DOI."
+# --- Main Entry ---
+if __name__ == '__main__':
+    from dotenv import load_dotenv
+    load_dotenv()
 
-# === Пример запуска ===
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    if not token:
+        raise RuntimeError("TELEGRAM_BOT_TOKEN не установлен в переменных окружения.")
 
-if __name__ == "__main__":
-    sample_doi_url = "https://doi.org/10.1080/10811680.2024.2384356"
-    print(handle_doi(sample_doi_url))
+    app = ApplicationBuilder().token(token).build()
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    app.run_polling()
