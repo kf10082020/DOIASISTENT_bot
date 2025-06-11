@@ -2,11 +2,9 @@ import requests
 from bs4 import BeautifulSoup
 import re
 
-
 def extract_doi(text):
     match = re.search(r"(10\.\d{4,9}/[-._;()/:A-Z0-9]+)", text, re.I)
     return match.group(1) if match else None
-
 
 def fetch_crossref(doi):
     try:
@@ -15,7 +13,6 @@ def fetch_crossref(doi):
         return res.json()["message"]
     except:
         return None
-
 
 def fetch_pubmed(doi):
     try:
@@ -35,7 +32,6 @@ def fetch_pubmed(doi):
         }
     except:
         return None
-
 
 def fetch_html_meta(doi_url):
     try:
@@ -61,7 +57,6 @@ def fetch_html_meta(doi_url):
     except:
         return None
 
-
 def build_reply(data):
     if not data:
         return "❌ Не удалось извлечь метаданные."
@@ -86,7 +81,6 @@ def build_reply(data):
         fields.append(f"\n📥 *PDF:* [Скачать PDF]({data['pdf_url']})")
 
     return "\n".join(fields)
-
 
 def handle_doi(doi_url):
     doi = extract_doi(doi_url)
