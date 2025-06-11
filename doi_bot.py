@@ -48,26 +48,35 @@ def fetch_metadata_from_html(doi_url: str):
         return None
 
 # === ФОРМИРОВАНИЕ РЕСПОНСА ===
-def build_response(data):
-    if "message" in data:
-        m = data["message"]
-        authors = ", ".join(f"{a.get('given', '')} {a.get('family', '')}" for a in m.get("author", []))
-        title = m.get("title", ["—"])[0]
-        year = m.get("issued", {}).get("date-parts", [[None]])[0][0]
-        journal = m.get("container-title", ["—"])[0]
-        volume = m.get("volume", "—")
-        issue = m.get("issue", "—")
-        pages = m.get("page", "—")
-        url = m.get("URL", "—")
+import re
 
-        return (
-            f"📖 *Название:* {title}\n"
-            f"👨‍🔬 *Авторы:* {authors or '—'}\n"
-            f"📅 *Год:* {year or '—'}\n"
-            f"📚 *Журнал:* {journal}\n"
-            f"📦 *Том:* {volume}, *Выпуск:* {issue}\n"
-            f"📄 *Страницы:* {pages}\n"
-            f"🔗 *DOI:* {url}"
+def clean_html(text):
+    return re.sub('<[^<]+?>', '', text)
+
+def build_reply(data):
+    title    = data.get("title", ["–"])[0]
+    authors  = ", ".join([a.get("family", "") for a in data.get("author", [])])
+    issued   = data.get("issued", {}).get("date-parts", [[None]])[0][0] or "—"
+    journal  = data.get("container-title", ["–"])[0]
+    volume   = data.get("volume", "–")
+    issue    = data.get("issue", "–")
+    pages    = data.get("page", "–")
+    url      = data.get("URL", "–")
+    abstract = data.get("abstract", "—")
+    abstract_clean = clean_html(abstract)
+    abstract_ru = "перевод временно отключен"
+
+    text = (
+        f"*📘 Название:* {title}\n"
+        f"*✍️ Авторы:* {authors}\n"
+        f"*📅 Год:* {issued}\n"
+        f"*🏛 Журнал:* {journal}\n"
+        f"*📑 Том / Выпуск / Страницы:* {volume} / {issue} / {pages}\n"
+        f"*🔗 DOI / URL:* {url}\n\n"
+        f"*📝 Аннотация:* {abstract_clean[:500]}...\n"
+        f"*🔄 Перевод:* {abstract_ru}"
+    )
+    return text
         )
     else:
         return (
