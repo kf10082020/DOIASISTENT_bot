@@ -1,115 +1,106 @@
-import telebot
 import requests
 from bs4 import BeautifulSoup
 import re
 
-# 🔐 Укажи свой токен Telegram-бота здесь
-TELEGRAM_TOKEN = "7822435522:AAH-ZTQuCCxSr385076vyljKLwO8k5Un3DU"
-bot = telebot.TeleBot(TELEGRAM_TOKEN, parse_mode="Markdown")
+# === ИСТОЧНИКИ МЕТАДАННЫХ ===
 
-# === DOI обработка ===
-
-def extract_doi(text):
-    match = re.search(r"(10\.\d{4,9}/[-._;()/:A-Z0-9]+)", text, re.I)
-    return match.group(1) if match else None
-
-def fetch_crossref(doi):
+def fetch_metadata_crossref(doi):
     try:
-        res = requests.get(f"https://api.crossref.org/works/{doi}", timeout=10)
-        res.raise_for_status()
-        return res.json()["message"]
-    except:
+        url = f"https://api.crossref.org/works/{doi}"
+        r = requests.get(url, timeout=10)
+        r.raise_for_status()
+        return r.json()["message"]
+    except Exception:
         return None
 
-def fetch_pubmed(doi):
+def fetch_metadata_pubmed(doi):
     try:
-        base = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
-        esearch = f"{base}/esearch.fcgi?db=pubmed&term={doi}&retmode=json"
-        pmid = requests.get(esearch, timeout=10).json()["esearchresult"]["idlist"][0]
+        query = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term={doi}&retmode=json"
+        r = requests.get(query, timeout=10)
+        r.raise_for_status()
+        pmid = r.json()["esearchresult"]["idlist"][0]
 
-        efetch = f"{base}/efetch.fcgi?db=pubmed&id={pmid}&retmode=xml"
-        soup = BeautifulSoup(requests.get(efetch).content, "xml")
-
+        fetch = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id={pmid}&retmode=xml"
+        r = requests.get(fetch, timeout=10)
+        soup = BeautifulSoup(r.content, "xml")
         return {
-            "title": soup.findtext("ArticleTitle", default="—"),
+            "title": soup.find("ArticleTitle").text,
             "authors": [x.text for x in soup.find_all("LastName")],
-            "journal": soup.findtext("Title", default="—"),
-            "issued": soup.findtext("PubDate", default="—"),
-            "abstract": soup.findtext("AbstractText", default="Нет аннотации")
+            "journal": soup.find("Title").text,
+            "issued": soup.find("PubDate").text,
+            "abstract": soup.find("AbstractText").text,
+            "volume": None,
+            "issue": None,
+            "pages": None,
+            "pdf_url": None
         }
-    except:
+    except Exception:
         return None
 
-def fetch_html_meta(doi_url):
+def fetch_metadata_html(doi_url):
     try:
         headers = {"User-Agent": "Mozilla/5.0"}
-        soup = BeautifulSoup(requests.get(doi_url, headers=headers, timeout=10).text, "html.parser")
-        meta = lambda name: soup.find("meta", {"name": name})
-        get = lambda name: meta(name)["content"] if meta(name) else None
+        r = requests.get(doi_url, headers=headers, timeout=10)
+        r.raise_for_status()
+        soup = BeautifulSoup(r.text, "html.parser")
 
-        authors = soup.find_all("meta", {"name": "citation_author"})
-        author_list = [a["content"] for a in authors] if authors else []
+        def meta(name):
+            tag = soup.find("meta", {"name": name})
+            return tag["content"] if tag else None
 
         return {
-            "title": get("citation_title"),
-            "authors": author_list,
-            "journal": get("citation_journal_title"),
-            "issued": get("citation_publication_date"),
-            "volume": get("citation_volume"),
-            "issue": get("citation_issue"),
-            "pages": get("citation_firstpage"),
-            "abstract": get("description") or "Нет аннотации",
-            "pdf_url": get("citation_pdf_url")
+            "title": meta("citation_title"),
+            "authors": meta("citation_author"),
+            "journal": meta("citation_journal_title"),
+            "issued": meta("citation_publication_date"),
+            "volume": meta("citation_volume"),
+            "issue": meta("citation_issue"),
+            "pages": meta("citation_firstpage"),
+            "abstract": meta("description") or meta("citation_abstract"),
+            "pdf_url": meta("citation_pdf_url")
         }
-    except:
+    except Exception:
         return None
+
+# === ОБРАБОТЧИК РЕЗУЛЬТАТА ===
 
 def build_reply(data):
     if not data:
         return "❌ Не удалось извлечь метаданные."
 
-    authors = data.get("authors")
-    if isinstance(authors, list):
-        authors = ', '.join(authors)
-    authors = authors or "—"
+    authors = ", ".join(data.get("authors", [])) if isinstance(data.get("authors"), list) else data.get("authors", "—")
 
-    fields = [
-        f"📘 *Название:* {data.get('title', '—')}",
-        f"👨‍🔬 *Авторы:* {authors}",
-        f"📅 *Год:* {data.get('issued', '—')}",
-        f"📚 *Журнал:* {data.get('journal', '—')}",
-        f"📦 *Том:* {data.get('volume', '—')}",
-        f"📎 *Выпуск:* {data.get('issue', '—')}",
-        f"📄 *Страницы:* {data.get('pages', '—')}",
-        f"\n📝 *Аннотация:*\n{data.get('abstract', 'Нет аннотации')}"
-    ]
+    reply = f"📘 *Название:* {data.get('title', '—')}\n"
+    reply += f"👨‍🔬 *Авторы:* {authors}\n"
+    reply += f"📅 *Год:* {data.get('issued', '—')}\n"
+    reply += f"📚 *Журнал:* {data.get('journal', '—')}\n"
+    reply += f"📦 *Том:* {data.get('volume', '—')}\n"
+    reply += f"📎 *Выпуск:* {data.get('issue', '—')}\n"
+    reply += f"📄 *Страницы:* {data.get('pages', '—')}\n"
+    reply += f"\n📝 *Аннотация:*\n{data.get('abstract', 'Нет аннотации')}\n"
 
     if data.get("pdf_url"):
-        fields.append(f"\n📥 *PDF:* [Скачать PDF]({data['pdf_url']})")
+        reply += f"\n📥 *PDF:* [Скачать PDF]({data['pdf_url']})\n"
 
-    return "\n".join(fields)
+    return reply
+
+# === ОСНОВНАЯ ФУНКЦИЯ ===
 
 def handle_doi(doi_url):
-    doi = extract_doi(doi_url)
+    doi = re.findall(r"10\.\d{4,9}/[-._;()/:A-Z0-9]+", doi_url, re.I)
     if not doi:
         return "❌ DOI не распознан."
+    doi = doi[0]
 
-    for fetcher in [fetch_crossref, fetch_pubmed, lambda _: fetch_html_meta(doi_url)]:
-        data = fetcher(doi)
+    for fetcher in [fetch_metadata_crossref, fetch_metadata_pubmed, fetch_metadata_html]:
+        data = fetcher(doi if fetcher != fetch_metadata_html else doi_url)
         if data:
             return build_reply(data)
 
-    return "❌ Не удалось получить данные ни с одного источника."
+    return "❌ Не удалось найти публикацию по DOI."
 
-# === Обработчик сообщений Telegram ===
+# === Пример запуска ===
 
-@bot.message_handler(func=lambda m: True)
-def reply_to_message(message):
-    doi_url = message.text.strip()
-    response = handle_doi(doi_url)
-    bot.send_message(message.chat.id, response)
-
-# === Запуск ===
 if __name__ == "__main__":
-    print("🤖 DOI Бот запущен.")
-    bot.infinity_polling()
+    sample_doi_url = "https://doi.org/10.1080/10811680.2024.2384356"
+    print(handle_doi(sample_doi_url))
