@@ -1,6 +1,13 @@
+import telebot
 import requests
 from bs4 import BeautifulSoup
 import re
+
+# 🔐 Укажи свой токен Telegram-бота здесь
+TELEGRAM_TOKEN = "7822435522:AAH-ZTQuCCxSr385076vyljKLwO8k5Un3DU"
+bot = telebot.TeleBot(TELEGRAM_TOKEN, parse_mode="Markdown")
+
+# === DOI обработка ===
 
 def extract_doi(text):
     match = re.search(r"(10\.\d{4,9}/[-._;()/:A-Z0-9]+)", text, re.I)
@@ -94,8 +101,15 @@ def handle_doi(doi_url):
 
     return "❌ Не удалось получить данные ни с одного источника."
 
+# === Обработчик сообщений Telegram ===
 
-# === Тест ===
+@bot.message_handler(func=lambda m: True)
+def reply_to_message(message):
+    doi_url = message.text.strip()
+    response = handle_doi(doi_url)
+    bot.send_message(message.chat.id, response)
+
+# === Запуск ===
 if __name__ == "__main__":
-    test_doi = "https://doi.org/10.1080/10811680.2024.2384356"
-    print(handle_doi(test_doi))
+    print("🤖 DOI Бот запущен.")
+    bot.infinity_polling()
