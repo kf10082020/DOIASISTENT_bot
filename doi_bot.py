@@ -1,124 +1,99 @@
-import os
-import logging
 import requests
 from bs4 import BeautifulSoup
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
-
-# Заменить на свой токен
-TOKEN = os.getenv("TOKEN") or "7822435522:AAH-ZTQuCCxSr385076vyljKLwO8k5Un3DU"
-
-# Настройка логов
-logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# === ФУНКЦИЯ 1 === ПОЛУЧЕНИЕ МЕТАДАННЫХ ИЗ CROSSREF ===
-def fetch_metadata_from_crossref(doi: str):
-    url = f"https://api.crossref.org/works/{doi}"
-    headers = {"Accept": "application/json"}
-    try:
-        response = requests.get(url, headers=headers, timeout=10)
-        if response.status_code == 200:
-            return response.json()
-    except Exception as e:
-        logger.error(f"Ошибка при получении Crossref: {e}")
-    return None
-
-# === ФУНКЦИЯ 2 === ПАРСИНГ HTML-КАРТОЧКИ ПУБЛИКАЦИИ (резервный путь) ===
-def fetch_metadata_from_html(doi_url: str):
-    try:
-        res = requests.get(doi_url, timeout=10)
-        soup = BeautifulSoup(res.text, 'html.parser')
-        title = soup.find("meta", attrs={"name": "citation_title"})
-        authors = soup.find_all("meta", attrs={"name": "citation_author"})
-        year = soup.find("meta", attrs={"name": "citation_publication_date"})
-        journal = soup.find("meta", attrs={"name": "citation_journal_title"})
-        pages = soup.find("meta", attrs={"name": "citation_firstpage"})
-
-        return {
-            "title": title["content"] if title else "—",
-            "authors": [a["content"] for a in authors] if authors else [],
-            "year": year["content"] if year else "—",
-            "journal": journal["content"] if journal else "—",
-            "pages": pages["content"] if pages else "—",
-            "download_link": doi_url
-        }
-    except Exception as e:
-        logger.error(f"Ошибка при HTML-парсинге: {e}")
-        return None
-
-# === ФОРМИРОВАНИЕ РЕСПОНСА ===
 import re
 
-def clean_html(text):
-    return re.sub('<[^<]+?>', '', text)
+# --- Основные методы ---
+
+def fetch_metadata_crossref(doi):
+    try:
+        url = f"https://api.crossref.org/works/{doi}"
+        r = requests.get(url, timeout=10)
+        r.raise_for_status()
+        return r.json()["message"]
+    except Exception:
+        return None
+
+def fetch_metadata_pubmed(doi):
+    try:
+        query = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term={doi}&retmode=json"
+        r = requests.get(query, timeout=10)
+        r.raise_for_status()
+        pmid = r.json()["esearchresult"]["idlist"][0]
+
+        fetch = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id={pmid}&retmode=xml"
+        r = requests.get(fetch, timeout=10)
+        soup = BeautifulSoup(r.content, "xml")
+        return {
+            "title": soup.find("ArticleTitle").text,
+            "authors": [x.text for x in soup.find_all("LastName")],
+            "journal": soup.find("Title").text,
+            "issued": soup.find("PubDate").text,
+            "abstract": soup.find("AbstractText").text
+        }
+    except Exception:
+        return None
+
+def fetch_metadata_html(doi_url):
+    try:
+        headers = {"User-Agent": "Mozilla/5.0"}
+        r = requests.get(doi_url, headers=headers, timeout=10)
+        r.raise_for_status()
+        soup = BeautifulSoup(r.text, "html.parser")
+
+        def meta(name):
+            tag = soup.find("meta", {"name": name})
+            return tag["content"] if tag else None
+
+        return {
+            "title": meta("citation_title"),
+            "authors": meta("citation_author"),
+            "journal": meta("citation_journal_title"),
+            "issued": meta("citation_publication_date"),
+            "volume": meta("citation_volume"),
+            "issue": meta("citation_issue"),
+            "pages": meta("citation_firstpage"),
+            "abstract": meta("description"),
+            "pdf_url": meta("citation_pdf_url")
+        }
+    except Exception:
+        return None
 
 def build_reply(data):
-    title    = data.get("title", ["–"])[0]
-    authors  = ", ".join([a.get("family", "") for a in data.get("author", [])])
-    issued   = data.get("issued", {}).get("date-parts", [[None]])[0][0] or "—"
-    journal  = data.get("container-title", ["–"])[0]
-    volume   = data.get("volume", "–")
-    issue    = data.get("issue", "–")
-    pages    = data.get("page", "–")
-    url      = data.get("URL", "–")
-    abstract = data.get("abstract", "—")
-    abstract_clean = clean_html(abstract)
-    abstract_ru = "перевод временно отключен"
+    if not data:
+        return "❌ Не удалось извлечь метаданные."
 
-    text = (
-        f"*📘 Название:* {title}\n"
-        f"*✍️ Авторы:* {authors}\n"
-        f"*📅 Год:* {issued}\n"
-        f"*🏛 Журнал:* {journal}\n"
-        f"*📑 Том / Выпуск / Страницы:* {volume} / {issue} / {pages}\n"
-        f"*🔗 DOI / URL:* {url}\n\n"
-        f"*📝 Аннотация:* {abstract_clean[:500]}...\n"
-        f"*🔄 Перевод:* {abstract_ru}"
-    )
-    return text
-        )
-    else:
-        return (
-            f"📖 *Название:* {data['title']}\n"
-            f"👨‍🔬 *Авторы:* {', '.join(data['authors']) or '—'}\n"
-            f"📅 *Год:* {data['year']}\n"
-            f"📚 *Журнал:* {data['journal']}\n"
-            f"📄 *Страницы:* {data['pages']}\n"
-            f"🔗 *Ссылка:* {data['download_link']}"
-        )
+    authors = ", ".join(data.get("authors", [])) if isinstance(data.get("authors"), list) else data.get("authors", "—")
 
-# === ОБРАБОТЧИК СООБЩЕНИЙ С DOI ===
-async def handle_doi(update: Update, context: CallbackContext):
-    doi_url = update.message.text.strip()
-    if "doi.org/" not in doi_url:
-        await update.message.reply_text("❗ Пожалуйста, отправьте ссылку вида `https://doi.org/...`")
-        return
+    reply = f"📘 *Название:* {data.get('title', '—')}\n"
+    reply += f"👨‍🔬 *Авторы:* {authors}\n"
+    reply += f"📅 *Год:* {data.get('issued', '—')}\n"
+    reply += f"📚 *Журнал:* {data.get('journal', '—')}\n"
+    reply += f"📦 *Том:* {data.get('volume', '—')}\n"
+    reply += f"📎 *Выпуск:* {data.get('issue', '—')}\n"
+    reply += f"📄 *Страницы:* {data.get('pages', '—')}\n"
+    reply += f"\n📝 *Аннотация:*\n{data.get('abstract', 'Нет аннотации')}\n"
+    if data.get("pdf_url"):
+        reply += f"\n📥 *PDF:* [Скачать PDF]({data['pdf_url']})\n"
 
-    doi = doi_url.split("doi.org/")[-1]
-    metadata = fetch_metadata_from_crossref(doi)
+    return reply
 
-    if metadata:
-        response = build_response(metadata)
-    else:
-        fallback_data = fetch_metadata_from_html(doi_url)
-        if fallback_data:
-            response = build_response(fallback_data)
-        else:
-            response = "⚠️ Не удалось получить информацию по ссылке."
+# --- Основной обработчик ---
 
-    await update.message.reply_text(response, parse_mode="Markdown")
+def handle_doi(doi_url):
+    doi = re.findall(r"10\.\d{4,9}/[-._;()/:A-Z0-9]+", doi_url, re.I)
+    if not doi:
+        return "❌ DOI не распознан."
+    doi = doi[0]
 
-# === СТАРТ КОМАНДА ===
-async def start(update: Update, context: CallbackContext):
-    await update.message.reply_text("Привет! Отправьте мне DOI статьи, и я найду по ней информацию.")
+    data = fetch_metadata_crossref(doi)
+    if not data:
+        data = fetch_metadata_pubmed(doi)
+    if not data:
+        data = fetch_metadata_html(doi_url)
 
-# === ОСНОВНОЙ ЦИКЛ ===
-def main():
-    app = Application.builder().token(TOKEN).build()
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_doi))
-    app.run_polling()
+    return build_reply(data)
 
+# Пример вызова
 if __name__ == "__main__":
-    main()
+    sample_doi = "https://doi.org/10.1080/10811680.2024.2384356"
+    print(handle_doi(sample_doi))
