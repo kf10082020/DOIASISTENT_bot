@@ -14,7 +14,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 def fetch_metadata(doi):
     headers = {"Accept": "application/vnd.citationstyles.csl+json"}
-    url = f"https://doi.org/{doi.strip()}" esponse = requests.get(url, headers=headers)
+    url = f"https://doi.org/{doi.strip()}" response = requests.get(url, headers=headers)
 
     if response.status_code == 200:
         return response.json()
