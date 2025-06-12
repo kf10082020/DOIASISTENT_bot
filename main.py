@@ -7,7 +7,7 @@ from parsers.doi_handler import handle_doi
 from utils.formatter import format_reply
 
 load_dotenv()
-TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TOKEN = os.getenv("DOIASISTENT_bot")
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Привет! Отправь DOI-ссылку для получения информации.")
