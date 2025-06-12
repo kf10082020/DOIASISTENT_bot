@@ -1,1 +1,2 @@
-# Список зависимостей (telegram, dotenv, requests)
+python-telegram-bot==20.0
+requests==2.31.0
