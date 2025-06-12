@@ -97,11 +97,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text.strip()
     doi = extract_doi(text)
-    if not doi:
+     if not doi:
         await update.message.reply_text("❌ DOI не найден. Отправь корректную ссылку.")
         return
 
     doi_url = f"https://doi.org/{doi}"
+    print(f"[DEBUG] Получен DOI: {doi}")
     data = fetch_metadata_crossref(doi) or fetch_metadata_pubmed(doi) or fetch_metadata_html(doi_url)
     reply = build_reply(data)
     await update.message.reply_markdown(reply, disable_web_page_preview=True)
