@@ -1,6 +1,5 @@
 import os
 import logging
-from dotenv import load_dotenv
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     ApplicationBuilder,
@@ -20,7 +19,6 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Загрузка токена
-load_dotenv()
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
 # Команда /start
