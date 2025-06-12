@@ -1,3 +1,4 @@
+
 import os
 from dotenv import load_dotenv
 from telegram import Update
@@ -6,7 +7,7 @@ from parsers.doi_handler import handle_doi
 from utils.formatter import format_reply
 
 load_dotenv()
-TOKEN = os.getenv("8000984168:AAE9J8HAdnYqcB8f1x-asBaf1y2a8cf3C-E")
+TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Привет! Отправь DOI-ссылку для получения информации.")
