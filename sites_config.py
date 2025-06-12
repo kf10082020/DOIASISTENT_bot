@@ -8,55 +8,55 @@ def parse_sciencedirect(url):
     return {"title": "Sciencedirect parser (заглушка)", "authors": "—", "journal": "Sciencedirect", "issued": "—"}
 
 def parse_sagepub(url):
-    return {"title": "journals.sagepub parser (заглушка)", "authors": "—", "journal": "journals.sagepub", "issued": "—"}
+    return {"title": "Sagepub parser (заглушка)", "authors": "—", "journal": "Sagepub", "issued": "—"}
 
 def parse_tandfonline(url):
-    return {"title": "tandfonline parser (заглушка)", "authors": "—", "journal": "tandfonline", "issued": "—"}
+    return {"title": "Tandfonline parser (заглушка)", "authors": "—", "journal": "Tandfonline", "issued": "—"}
 
 def parse_bmcmedicine(url):
-    return {"title": "bmcmedicine.biomedcentral parser (заглушка)", "authors": "—", "journal": "bmcmedicine.biomedcentral", "issued": "—"}
+    return {"title": "Bmcmedicine parser (заглушка)", "authors": "—", "journal": "Bmcmedicine", "issued": "—"}
 
 def parse_frontiersin(url):
-    return {"title": "frontiersin parser (заглушка)", "authors": "—", "journal": "frontiersin", "issued": "—"}
+    return {"title": "Frontiersin parser (заглушка)", "authors": "—", "journal": "Frontiersin", "issued": "—"}
 
 def parse_routledge(url):
-    return {"title": "routledge parser (заглушка)", "authors": "—", "journal": "routledge", "issued": "—"}
+    return {"title": "Routledge parser (заглушка)", "authors": "—", "journal": "Routledge", "issued": "—"}
 
 def parse_wiley(url):
-    return {"title": "onlinelibrary.wiley parser (заглушка)", "authors": "—", "journal": "onlinelibrary.wiley", "issued": "—"}
+    return {"title": "wiley parser (заглушка)", "authors": "—", "journal": "wiley", "issued": "—"}
 
 def parse_jstor(url):
     return {"title": "jstor parser (заглушка)", "authors": "—", "journal": "jstor", "issued": "—"}
 
 def parse_muse(url):
-    return {"title": "muse.jhu parser (заглушка)", "authors": "—", "journal": "muse.jhu", "issued": "—"}
+    return {"title": "Muse parser (заглушка)", "authors": "—", "journal": "Muse", "issued": "—"}
 
 def parse_crossref(url):
-    return {"title": "search.crossref parser (заглушка)", "authors": "—", "journal": "search.crossref", "issued": "—"}
+    return {"title": "crossref parser (заглушка)", "authors": "—", "journal": "crossref", "issued": "—"}
 
 def parse_scholar(url):
-    return {"title": "scholar.google parser (заглушка)", "authors": "—", "journal": "scholar.google", "issued": "—"}
+    return {"title": "scholar parser (заглушка)", "authors": "—", "journal": "scholar", "issued": "—"}
 
 def parse_doaj(url):
-    return {"title": "doaj.org parser (заглушка)", "authors": "—", "journal": "doaj.org", "issued": "—"}
+    return {"title": "Doaj parser (заглушка)", "authors": "—", "journal": "Doaj", "issued": "—"}
 
 def parse_pubmed(url):
-    return {"title": "pubmed.ncbi.nlm.nih parser (заглушка)", "authors": "—", "journal": "pubmed.ncbi.nlm.nih", "issued": "—"}
+    return {"title": "Pubmed parser (заглушка)", "authors": "—", "journal": "Pubmed", "issued": "—"}
 
 def parse_ijirmf(url):
-    return {"title": "ijirmf parser (заглушка)", "authors": "—", "journal": "ijirmf", "issued": "—"}
+    return {"title": "Ijirmf parser (заглушка)", "authors": "—", "journal": "Ijirmf", "issued": "—"}
 
 def parse_eric(url):
-    return {"title": "ieeexplore.ieee parser (заглушка)", "authors": "—", "journal": "ieeexplore.ieee", "issued": "—"}
+    return {"title": "Eric parser (заглушка)", "authors": "—", "journal": "Eric", "issued": "—"}
 
 def parse_ieee(url):
-    return {"title": "dl.acm parser (заглушка)", "authors": "—", "journal": "dl.acm", "issued": "—"}
+    return {"title": "Ieee parser (заглушка)", "authors": "—", "journal": "Ieee", "issued": "—"}
 
 def parse_acm(url):
-    return {"title": "ssrn.com parser (заглушка)", "authors": "—", "journal": "ssrn.com", "issued": "—"}
+    return {"title": "acm parser (заглушка)", "authors": "—", "journal": "acm", "issued": "—"}
 
 def parse_ssrn(url):
-    return {"title": "ssrn.com parser (заглушка)", "authors": "—", "journal": "ssrn.com", "issued": "—"}
+    return {"title": "ssrn parser (заглушка)", "authors": "—", "journal": "ssrn", "issued": "—"}
 
 
 SITES = {
@@ -65,7 +65,7 @@ SITES = {
     "www.sciencedirect.com": parse_sciencedirect,
     "journals.sagepub.com": parse_sagepub,
     "www.tandfonline.com": parse_tandfonline,
-    "bmcmedicine.biomedcentral.com": parse_biomedcentral,
+    "bmcmedicine.biomedcentral.com": parse_bmcmedicine,
     "www.frontiersin.org": parse_frontiersin,
     "www.routledge.com": parse_routledge,
     "onlinelibrary.wiley.com": parse_wiley,
