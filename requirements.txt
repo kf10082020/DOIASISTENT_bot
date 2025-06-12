@@ -1,4 +1,1 @@
-python-dotenv
-requests
-beautifulsoup4
-python-telegram-bot==20.0
+# Список зависимостей (telegram, dotenv, requests)

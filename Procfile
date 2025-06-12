@@ -1,1 +1,1 @@
-worker: python doi_bot.py
+# Указывает, что запускать (например: worker: python doi_bot.py)
