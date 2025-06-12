@@ -92,7 +92,7 @@ def extract_doi(text):
 
 # --- Telegram Handlers ---
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Привет! Отправь мне DOI-ссылку, и я выведу метаданные статьи.")
+    await update.message.reply_text("Добрый день! Отправь мне DOI-ссылку, и я выведу метаданные статьи.")
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text.strip()
