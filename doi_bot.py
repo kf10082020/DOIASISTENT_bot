@@ -67,7 +67,7 @@ def build_reply(data):
     reply += f"📦 *Том:* {data.get('volume', '—')}\n"
     reply += f"📎 *Выпуск:* {data.get('issue', '—')}\n"
     reply += f"📄 *Страницы:* {data.get('pages', '—')}\n"
-    reply += f"\n📝 *Аннотация:*\n{data.get('abstract', 'Нет аннотации')}\n"
+    reply += f"\n📝 *Аннотация:*\n{data.get('abstract', 'анотация на русском языке' 'Нет аннотации')}\n"
     if data.get("pdf_url"):
         reply += f"\n📥 *PDF:* [Скачать PDF]({data['pdf_url']})\n"
     return reply
