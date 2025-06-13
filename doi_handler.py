@@ -15,14 +15,21 @@ def handle_doi(doi: str) -> dict:
 
     final_url = response.url
 
-    # Только MDPI пока поддерживается
+    # Пока поддерживаем только MDPI
     if "mdpi.com" in final_url:
         return parse_mdpi_article(final_url, doi)
 
-    raise Exception("❌ DOI не поддерживается: пока реализована только поддержка MDPI.")
+    raise Exception("❌ DOI не поддерживается: реализована только поддержка MDPI.")
 
 def parse_mdpi_article(url: str, doi: str) -> dict:
-    response = requests.get(url)
+    headers = {
+        "User-Agent": "Mozilla/5.0",
+        "Accept": "text/html"
+    }
+    response = requests.get(url, headers=headers)
+    if response.status_code != 200:
+        raise Exception(f"Ошибка при загрузке страницы MDPI: {response.status_code}")
+
     soup = BeautifulSoup(response.text, 'html.parser')
 
     def get_meta(name):
@@ -33,14 +40,22 @@ def parse_mdpi_article(url: str, doi: str) -> dict:
     authors_list = [meta["content"].strip() for meta in soup.find_all("meta", {"name": "citation_author"}) if meta.get("content")]
     authors = ", ".join(authors_list) if authors_list else "—"
     journal = get_meta("citation_journal_title")
-    year = get_meta("citation_publication_date").split("/")[0]
+
+    # Для года берем первые 4 цифры из даты публикации (обычно в формате YYYY/MM/DD)
+    pub_date = get_meta("citation_publication_date")
+    year = pub_date.split("/")[0] if pub_date and pub_date != "—" else "—"
+
     volume = get_meta("citation_volume")
     issue = get_meta("citation_issue")
-    pages = get_meta("citation_firstpage") + "–" + get_meta("citation_lastpage") if get_meta("citation_firstpage") != "—" else "—"
+
+    first_page = get_meta("citation_firstpage")
+    last_page = get_meta("citation_lastpage")
+    pages = f"{first_page}–{last_page}" if first_page != "—" and last_page != "—" else "—"
+
     pdf_url = get_meta("citation_pdf_url")
 
-    # Пробуем взять аннотацию (если есть)
-    abstract_tag = soup.find("div", {"class": "art-abstract"})
+    # Ищем аннотацию: у MDPI она обычно внутри div с классом "art-abstract" или "abstract"
+    abstract_tag = soup.find("div", class_="art-abstract") or soup.find("div", class_="abstract")
     abstract = abstract_tag.get_text(strip=True) if abstract_tag else "Нет аннотации"
 
     return {
