@@ -1,40 +1,32 @@
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.helpers import escape_markdown
+def parse_mdpi_article(url: str, doi: str) -> dict:
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'html.parser')
 
-PUBLISH_URL = "https://yourpublicationform.com"
-MAX_LENGTH = 4000
+    def safe_get(name):
+        tag = soup.find("meta", {"name": name})
+        return tag["content"] if tag else "—"
 
-def format_reply(data):
-    if "error" in data:
-        return data["error"], None
-
-    # Подготовка текста
-    text = f"""📘 *Название:* {data.get('title', '—')}
-👨‍🔬 *Авторы:* {data.get('authors', '—')}
-📅 *Год:* {data.get('issued', '—')}
-📚 *Журнал:* {data.get('journal', '—')}
-📦 *Том:* {data.get('volume', '—')}
-📎 *Выпуск:* {data.get('issue', '—')}
-📄 *Страницы:* {data.get('pages', '—')}
-
-📝 *Аннотация:*
-{data.get('abstract', 'Нет аннотации')}
-
-✅ *Выводы:*
-{data.get('conclusion', '—')}
-
-💡 *Предложения:*
-{data.get('suggestions', '—')}
-"""
-
-    if len(text) > MAX_LENGTH:
-        text = text[:MAX_LENGTH - 3] + "..."
-
-    # Кнопки
-    buttons = []
-    if data.get("pdf_url"):
-        buttons.append([InlineKeyboardButton("📥 Скачать PDF", url=data["pdf_url"])])
-    buttons.append([InlineKeyboardButton("🚀 Опубликовать труд", url=PUBLISH_URL)])
-
-    keyboard = InlineKeyboardMarkup(buttons)
-    return text, keyboard
+    title = safe_get("citation_title")
+    authors = [tag["content"] for tag in soup.find_all("meta", {"name": "citation_author"})]
+    journal = safe_get("citation_journal_title")
+    year = safe_get("citation_publication_date").split("/")[0]
+    volume = safe_get("citation_volume")
+    issue = safe_get("citation_issue")
+    pages = safe_get("citation_firstpage") + "–" + safe_get("citation_lastpage")
+    pdf_url = safe_get("citation_pdf_url")
+    
+    return {
+        "title": title,
+        "authors": ", ".join(authors),
+        "journal": journal,
+        "issued": year,
+        "volume": volume,
+        "issue": issue,
+        "pages": pages if "—" not in pages else "—",
+        "abstract": "—",        # Можно парсить отдельно при необходимости
+        "conclusion": "—",      # Нет в структуре MDPI по умолчанию
+        "suggestions": "—",     # Нет в структуре MDPI по умолчанию
+        "pdf_url": pdf_url,
+        "doi": doi,
+        "url": url
+    }
