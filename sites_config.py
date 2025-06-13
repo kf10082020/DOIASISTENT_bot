@@ -1,4 +1,4 @@
-﻿def parse_mdpi(url): return {"title": "MDPI parser", "authors": "—", "journal": "MDPI", "issued": "—"}
+﻿def parse_mdpi(url): return fetch_metadata_html(url)
 def parse_springer(url): return {"title": "Springer parser", "authors": "—", "journal": "Springer", "issued": "—"}
 def parse_sciencedirect(url): return {"title": "Sciencedirect parser", "authors": "—", "journal": "Sciencedirect", "issued": "—"}
 def parse_sagepub(url): return {"title": "Sagepub parser", "authors": "—", "journal": "Sagepub", "issued": "—"}
