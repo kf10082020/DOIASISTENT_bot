@@ -4,7 +4,7 @@ import re
 import requests
 from bs4 import BeautifulSoup
 from telegram import Update
-from telegram.ext import CallbackQueryHandler
+from telegram.ext import CallbackQueryHandler, ContextTypes
 
 async def handle_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -15,8 +15,6 @@ async def handle_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text="🔔 Ссылка на публикацию вашего научного труда: [Открыть форму](https://your-platform.com/publish)",
             parse_mode="Markdown"
         )
-
-app.add_handler(CallbackQueryHandler(handle_button))
 
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
 
