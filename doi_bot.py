@@ -2,7 +2,7 @@
 import logging
 import re
 import requests
-from telegram.ext import ContextTypes #
+from telegram.ext import ContextTypes
 from bs4 import BeautifulSoup
 from telegram import Update
 from telegram.ext import CallbackQueryHandler 
