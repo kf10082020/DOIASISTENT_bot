@@ -7,16 +7,15 @@ def handle_doi(doi: str) -> dict:
         "Accept": "text/html"
     }
 
-    # Переходим по DOI
     doi_url = f"https://doi.org/{doi}"
     response = requests.get(doi_url, headers=headers, allow_redirects=True)
 
     if response.status_code != 200:
-        raise Exception(f"Ошибка запроса: {response.status_code}")
+        raise Exception(f"Ошибка при переходе по DOI: {response.status_code}")
 
     final_url = response.url
 
-    # Обработка MDPI
+    # Только MDPI пока поддерживается
     if "mdpi.com" in final_url:
         return parse_mdpi_article(final_url, doi)
 
@@ -26,18 +25,36 @@ def parse_mdpi_article(url: str, doi: str) -> dict:
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'html.parser')
 
-    title = soup.find("meta", {"name": "citation_title"})["content"]
-    authors = [meta["content"] for meta in soup.find_all("meta", {"name": "citation_author"})]
-    journal = soup.find("meta", {"name": "citation_journal_title"})["content"]
-    year = soup.find("meta", {"name": "citation_publication_date"})["content"].split("/")[0]
-    pdf_url = soup.find("meta", {"name": "citation_pdf_url"})["content"]
+    def get_meta(name):
+        tag = soup.find("meta", {"name": name})
+        return tag["content"].strip() if tag and tag.get("content") else "—"
+
+    title = get_meta("citation_title")
+    authors_list = [meta["content"].strip() for meta in soup.find_all("meta", {"name": "citation_author"}) if meta.get("content")]
+    authors = ", ".join(authors_list) if authors_list else "—"
+    journal = get_meta("citation_journal_title")
+    year = get_meta("citation_publication_date").split("/")[0]
+    volume = get_meta("citation_volume")
+    issue = get_meta("citation_issue")
+    pages = get_meta("citation_firstpage") + "–" + get_meta("citation_lastpage") if get_meta("citation_firstpage") != "—" else "—"
+    pdf_url = get_meta("citation_pdf_url")
+
+    # Пробуем взять аннотацию (если есть)
+    abstract_tag = soup.find("div", {"class": "art-abstract"})
+    abstract = abstract_tag.get_text(strip=True) if abstract_tag else "Нет аннотации"
 
     return {
         "title": title,
         "authors": authors,
         "journal": journal,
-        "year": year,
+        "issued": year,
+        "volume": volume,
+        "issue": issue,
+        "pages": pages,
+        "abstract": abstract,
+        "conclusion": "—",
+        "suggestions": "—",
+        "pdf_url": pdf_url,
         "doi": doi,
-        "url": url,
-        "pdf_url": pdf_url
+        "url": url
     }
