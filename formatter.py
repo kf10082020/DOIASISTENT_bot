@@ -1,4 +1,4 @@
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+﻿from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 def format_reply(data):
     if "error" in data:

@@ -1,4 +1,4 @@
-from urllib.parse import urlparse
+﻿from urllib.parse import urlparse
 from sites_config import SITES
 
 def handle_doi(doi_url):

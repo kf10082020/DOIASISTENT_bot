@@ -1,9 +1,9 @@
-def parse_mdpi(url): return {"title": "MDPI parser", "authors": "—", "journal": "MDPI", "issued": "—"}
+﻿def parse_mdpi(url): return {"title": "MDPI parser", "authors": "—", "journal": "MDPI", "issued": "—"}
 def parse_springer(url): return {"title": "Springer parser", "authors": "—", "journal": "Springer", "issued": "—"}
 def parse_sciencedirect(url): return {"title": "Sciencedirect parser", "authors": "—", "journal": "Sciencedirect", "issued": "—"}
 def parse_sagepub(url): return {"title": "Sagepub parser", "authors": "—", "journal": "Sagepub", "issued": "—"}
 def parse_tandfonline(url): return {"title": "Tandfonline parser", "authors": "—", "journal": "Tandfonline", "issued": "—"}
-def parse_bmcmedicine(url): return {"title": "Bmcmedicine parser", "authors": "—", "journal": "Bmcmedicine", "issued": "—"}
+def parse_bmcmedicine(url): return {"title": "Bmcmedicine parser" "authors": "—", "journal": "Bmcmedicine", "issued": "—"}
 def parse_frontiersin(url): return {"title": "Frontiersin parser", "authors": "—", "journal": "Frontiersin", "issued": "—"}
 def parse_routledge(url): return {"title": "Routledge parser", "authors": "—", "journal": "Routledge", "issued": "—"}
 def parse_wiley(url): return {"title": "wiley parser", "authors": "—", "journal": "wiley", "issued": "—"}

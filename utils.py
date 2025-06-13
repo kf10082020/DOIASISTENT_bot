@@ -1,0 +1,1 @@
+﻿Хранит секреты: TELEGRAM_BOT_TOKEN
