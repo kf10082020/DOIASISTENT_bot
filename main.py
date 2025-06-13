@@ -58,7 +58,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 app = ApplicationBuilder().token(TOKEN).build()
 app.add_handler(CommandHandler("start", start))
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-app.add_handler(CallbackQueryHandler(handle_callback))
+app.add_handler(CallbackQueryHandler(handle_button))
 
 if __name__ == "__main__":
     app.run_polling()
