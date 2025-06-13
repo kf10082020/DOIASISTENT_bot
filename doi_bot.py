@@ -1,8 +1,5 @@
 import os
 import logging
-import re
-import requests
-from bs4 import BeautifulSoup
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     ApplicationBuilder, CommandHandler, MessageHandler,
@@ -13,16 +10,19 @@ from formatter import format_reply
 from utils import extract_doi
 
 # Логирование
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
 logger = logging.getLogger(__name__)
 
 MAX_LENGTH = 4000
 
-# Обработка команды /start
+# Команда /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("👋 День добрый! Отправьте DOI-ссылку, и я найду данные публикации.")
 
-# Обработка текстовых сообщений
+# Обработка текста
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text.strip()
     doi = extract_doi(text)
@@ -35,15 +35,20 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     try:
         metadata = handle_doi(doi)
+        logger.info(f"Metadata: {metadata}")  # ⬅ логирование для отладки
+
         reply_text, keyboard = format_reply(metadata)
+
         if len(reply_text) > MAX_LENGTH:
             reply_text = reply_text[:MAX_LENGTH - 3] + "..."
-        await update.message.reply_text(reply_text, parse_mode="Markdown", reply_markup=keyboard)
-    except Exception as e:
-        logger.error(f"Ошибка обработки DOI: {e}")
-        await update.message.reply_text("⚠️ Ошибка обработки DOI. Попробуйте позже.")
 
-# Обработка кнопок
+        await update.message.reply_text(reply_text, parse_mode="Markdown", reply_markup=keyboard)
+
+    except Exception as e:
+        logger.exception("Ошибка при обработке DOI")  # exception логирует traceback
+        await update.message.reply_text("⚠️ Произошла ошибка при обработке DOI. Попробуйте позже.")
+
+# Обработка inline-кнопки
 async def handle_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -61,7 +66,7 @@ if __name__ == '__main__':
 
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     if not token:
-        raise RuntimeError("TELEGRAM_BOT_TOKEN не установлен в переменных окружения.")
+        raise RuntimeError("❌ TELEGRAM_BOT_TOKEN не установлен в переменных окружения.")
 
     app = ApplicationBuilder().token(token).build()
     app.add_handler(CommandHandler("start", start))
