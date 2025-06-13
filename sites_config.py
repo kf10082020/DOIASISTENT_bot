@@ -1,55 +1,43 @@
-import requests
-from bs4 import BeautifulSoup
+def parse_mdpi(url): return {"title": "MDPI parser", "authors": "—", "journal": "MDPI", "issued": "—"}
+def parse_springer(url): return {"title": "Springer parser", "authors": "—", "journal": "Springer", "issued": "—"}
+def parse_sciencedirect(url): return {"title": "Sciencedirect parser", "authors": "—", "journal": "Sciencedirect", "issued": "—"}
+def parse_sagepub(url): return {"title": "Sagepub parser", "authors": "—", "journal": "Sagepub", "issued": "—"}
+def parse_tandfonline(url): return {"title": "Tandfonline parser", "authors": "—", "journal": "Tandfonline", "issued": "—"}
+def parse_bmcmedicine(url): return {"title": "Bmcmedicine parser" "authors": "—", "journal": "Bmcmedicine", "issued": "—"}
+def parse_frontiersin(url): return {"title": "Frontiersin parser", "authors": "—", "journal": "Frontiersin", "issued": "—"}
+def parse_routledge(url): return {"title": "Routledge parser", "authors": "—", "journal": "Routledge", "issued": "—"}
+def parse_wiley(url): return {"title": "wiley parser", "authors": "—", "journal": "wiley", "issued": "—"}
+def parse_jstor(url): return {"title": "jstor parser", "authors": "—", "journal": "jstor", "issued": "—"}
+def parse_muse(url): return {"title": "Muse parser", "authors": "—", "journal": "Muse", "issued": "—"}
+def parse_crossref(url): return {"title": "crossref parser", "authors": "—", "journal": "crossref", "issued": "—"}
+def parse_scholar(url): return {"title": "scholar parser", "authors": "—", "journal": "scholar", "issued": "—"}
+def parse_doaj(url): return {"title": "Doaj parser", "authors": "—", "journal": "Doaj", "issued": "—"}
+def parse_pubmed(url): return {"title": "Pubmed parser", "authors": "—", "journal": "Pubmed", "issued": "—"}
+def parse_ijirmf(url): return {"title": "Ijirmf parser", "authors": "—", "journal": "Ijirmf", "issued": "—"}
+def parse_eric(url): return {"title": "Eric parser", "authors": "—", "journal": "Eric", "issued": "—"}
+def parse_ieee(url): return {"title": "Ieee parser", "authors": "—", "journal": "Ieee", "issued": "—"}
+def parse_acm(url): return {"title": "acm parser", "authors": "—", "journal": "acm", "issued": "—"}
+def parse_ssrn(url): return {"title": "ssrn parser", "authors": "—", "journal": "ssrn", "issued": "—"}
 
-def fetch_metadata_html(url: str) -> dict:
-    try:
-        response = requests.get(url, timeout=10)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.text, "html.parser")
-
-        # Заголовок
-        title_tag = soup.find("h1", class_="title")
-        title = title_tag.get_text(strip=True) if title_tag else "—"
-
-        # Авторы
-        authors_tag = soup.find("div", class_="art-authors")
-        authors = authors_tag.get_text(" ", strip=True) if authors_tag else "—"
-
-        # Журнал и дата
-        journal_tag = soup.find("span", class_="journal-title")
-        journal = journal_tag.get_text(strip=True) if journal_tag else "MDPI"
-
-        date_tag = soup.find("div", class_="pubhistory")
-        issued = date_tag.get_text(strip=True).split(";")[0].replace("Published: ", "") if date_tag else "—"
-
-        # Том, выпуск, страницы (берём из breadcrumbs)
-        breadcrumbs = soup.find("ol", class_="breadcrumb")
-        parts = breadcrumbs.get_text(" ", strip=True).split() if breadcrumbs else []
-        volume = parts[parts.index("Volume") + 1] if "Volume" in parts else "—"
-        issue = parts[parts.index("Issue") + 1] if "Issue" in parts else "—"
-        pages = parts[parts.index("Article") + 1] if "Article" in parts else "—"
-
-        # Аннотация
-        abstract_tag = soup.find("div", class_="art-abstract in-tab")
-        abstract = abstract_tag.get_text(strip=True) if abstract_tag else "Нет аннотации"
-
-        # PDF-ссылка
-        pdf_link = soup.find("a", string="Download PDF")
-        pdf_url = "https://www.mdpi.com" + pdf_link["href"] if pdf_link else None
-
-        return {
-            "title": title,
-            "authors": authors,
-            "journal": journal,
-            "issued": issued[:4],
-            "volume": volume,
-            "issue": issue,
-            "pages": pages,
-            "abstract": abstract,
-            "conclusion": "—",
-            "suggestions": "—",
-            "pdf_url": pdf_url,
-        }
-
-    except Exception as e:
-        return {"error": f"Ошибка парсинга MDPI: {e}"}
+SITES = {
+    "www.mdpi.com": parse_mdpi,
+    "link.springer.com": parse_springer,
+    "www.sciencedirect.com": parse_sciencedirect,
+    "journals.sagepub.com": parse_sagepub,
+    "www.tandfonline.com": parse_tandfonline,
+    "bmcmedicine.biomedcentral.com": parse_bmcmedicine,
+    "www.frontiersin.org": parse_frontiersin,
+    "www.routledge.com": parse_routledge,
+    "onlinelibrary.wiley.com": parse_wiley,
+    "www.jstor.org": parse_jstor,
+    "muse.jhu.edu": parse_muse,
+    "search.crossref.org": parse_crossref,
+    "scholar.google.com": parse_scholar,
+    "doaj.org": parse_doaj,
+    "pubmed.ncbi.nlm.nih.gov": parse_pubmed,
+    "www.ijirmf.com": parse_ijirmf,
+    "eric.ed.gov": parse_eric,
+    "ieeexplore.ieee.org": parse_ieee,
+    "dl.acm.org": parse_acm,
+    "www.ssrn.com": parse_ssrn,      
+}
