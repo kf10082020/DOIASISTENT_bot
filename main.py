@@ -9,7 +9,7 @@ from telegram.ext import (
     ContextTypes,
     filters
 )
-
+from doi_bot import handle_button
 from doi_handler import handle_doi
 from formatter import format_reply
 from utils import extract_doi
