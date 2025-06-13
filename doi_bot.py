@@ -4,7 +4,8 @@ import re
 import requests
 from bs4 import BeautifulSoup
 from telegram import Update
-from telegram.ext import CallbackQueryHandler, ContextTypes
+from telegram.ext import CallbackQueryHandler 
+from telegram.ext import ContextTypes
 
 async def handle_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -111,8 +112,4 @@ if __name__ == '__main__':
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     if not token:
         raise RuntimeError("TELEGRAM_BOT_TOKEN не установлен в переменных окружения.")
-
-    app = ApplicationBuilder().token(token).build()
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-    app.run_polling()
+    
