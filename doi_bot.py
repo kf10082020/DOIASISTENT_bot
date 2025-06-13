@@ -3,9 +3,11 @@ import logging
 import re
 import requests
 from bs4 import BeautifulSoup
-from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, CallbackQueryHandler, ContextTypes, filters
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import (
+    ApplicationBuilder, CommandHandler, MessageHandler,
+    CallbackQueryHandler, ContextTypes, filters
+)
 from doi_handler import handle_doi
 from formatter import format_reply
 from utils import extract_doi
@@ -13,6 +15,8 @@ from utils import extract_doi
 # Логирование
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+MAX_LENGTH = 4000
 
 # Обработка команды /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -29,9 +33,15 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text("⌛ Обрабатываю запрос, подождите...")
 
-    metadata = handle_doi(doi)
-    reply_text, keyboard = format_reply(metadata)
-    await update.message.reply_text(reply_text, parse_mode="Markdown", reply_markup=keyboard)
+    try:
+        metadata = handle_doi(doi)
+        reply_text, keyboard = format_reply(metadata)
+        if len(reply_text) > MAX_LENGTH:
+            reply_text = reply_text[:MAX_LENGTH - 3] + "..."
+        await update.message.reply_text(reply_text, parse_mode="Markdown", reply_markup=keyboard)
+    except Exception as e:
+        logger.error(f"Ошибка обработки DOI: {e}")
+        await update.message.reply_text("⚠️ Ошибка обработки DOI. Попробуйте позже.")
 
 # Обработка кнопок
 async def handle_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
