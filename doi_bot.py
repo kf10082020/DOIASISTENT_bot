@@ -1,16 +1,12 @@
-import os
 import telebot
 from dotenv import load_dotenv
+import os
 from doi_handler import handle_doi
 
-# Загружаем токен из .env
 load_dotenv()
-TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+bot = telebot.TeleBot(BOT_TOKEN)
 
-# Инициализируем бота
-bot = telebot.TeleBot(TOKEN)
-
-# Обработка всех сообщений
 @bot.message_handler(func=lambda message: True)
 def handle_message(message):
     try:
@@ -34,7 +30,5 @@ def handle_message(message):
     except Exception as e:
         bot.send_message(message.chat.id, f"⚠️ Ошибка: {str(e)}")
 
-# Запускаем бота
-if __name__ == '__main__':
-    print("🤖 Бот запущен...")
+if __name__ == "__main__":
     bot.infinity_polling()
