@@ -1,7 +1,6 @@
 import requests
 from urllib.parse import urlparse
-from bs4 import BeautifulSoup
-from sites_config import SITES  # убедитесь, что файл в той же директории
+from sites_config import SITES  # Убедись, что этот файл есть и корректный
 
 def handle_doi(doi: str) -> dict:
     headers = {
@@ -29,4 +28,9 @@ def handle_doi(doi: str) -> dict:
 
     if domain in SITES:
         try:
-            parsed = SITES[domain]()
+            parsed = SITES[domain](final_url)
+            return parsed
+        except Exception as e:
+            raise Exception(f"Ошибка при парсинге сайта {domain}: {str(e)}")
+    else:
+        raise Exception(f"Домен {domain} не поддерживается")
