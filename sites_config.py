@@ -20,7 +20,6 @@ def create_parser_journal(journal_name):
         }
     return parser
 
-# Создаем словарь сайтов и их соответствующих парсеров
 SITES = {
     "www.mdpi.com": create_parser_journal("MDPI"),
     "link.springer.com": create_parser_journal("Springer"),
