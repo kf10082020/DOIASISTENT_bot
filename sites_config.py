@@ -42,5 +42,5 @@ SITES = {
     "eric.ed.gov": parse_eric,
     "ieeexplore.ieee.org": parse_ieee,
     "dl.acm.org": parse_acm,
-    "www.ssrn.com": parse_ssrn,      
+    "www.ssrn.com": parse_ssrn
 }
