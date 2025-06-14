@@ -30,5 +30,3 @@ def handle_message(message):
     except Exception as e:
         bot.send_message(message.chat.id, f"⚠️ Ошибка: {str(e)}")
 
-if __name__ == "__main__":
-    bot.infinity_polling()
