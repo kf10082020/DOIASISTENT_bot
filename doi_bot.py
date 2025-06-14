@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from urllib.parse import urlparse
 from dotenv import load_dotenv
 from sites_config import SITES
+from doi_handler import handle_doi
 
 load_dotenv()
 
