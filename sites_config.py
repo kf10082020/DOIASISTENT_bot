@@ -6,7 +6,19 @@ def parse_springer(url): return {"title": get_placeholder("Springer"), "authors"
 def parse_sciencedirect(url): return {"title": get_placeholder("Sciencedirect"), "authors": "—", "journal": "Sciencedirect", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
 def parse_sagepub(url): return {"title": get_placeholder("Sagepub"), "authors": "—", "journal": "Sagepub", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
 def parse_tandfonline(url): return {"title": get_placeholder("Tandfonline"), "authors": "—", "journal": "Tandfonline", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
-def parse_bmcmedicine(url): return {"title": get_placeholder("Bmcmedicine"), "authors": "—", "journal": "Bmcmedicine", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_bmcmedicine(url):
+    return {
+        "title": "Bmcmedicine",
+        "authors": "—",
+        "journal": "Bmcmedicine",
+        "issued": "—",
+        "volume": "—",
+        "issue": "—",
+        "pages": "—",
+        "abstract": "—",
+        "pdf_url": "—",
+        "url": url
+    }
 def parse_frontiersin(url): return {"title": get_placeholder("Frontiersin"), "authors": "—", "journal": "Frontiersin", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
 def parse_routledge(url): return {"title": get_placeholder("Routledge"), "authors": "—", "journal": "Routledge", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
 def parse_wiley(url): return {"title": get_placeholder("Wiley"), "authors": "—", "journal": "Wiley", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
