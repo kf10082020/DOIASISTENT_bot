@@ -1,7 +1,7 @@
 import requests
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
-from sites_config import SITES  # импорт словаря доменов и функций
+from sites_config import SITES  # убедитесь, что файл в той же директории
 
 def handle_doi(doi: str) -> dict:
     headers = {
@@ -10,24 +10,23 @@ def handle_doi(doi: str) -> dict:
     }
 
     doi_url = f"https://doi.org/{doi}"
-    response = requests.get(doi_url, headers=headers, allow_redirects=True)
+
+    try:
+        response = requests.get(doi_url, headers=headers, allow_redirects=True)
+    except Exception as e:
+        raise Exception(f"Ошибка подключения к https://doi.org: {str(e)}")
 
     if response.status_code != 200:
-        raise Exception(f"Ошибка при переходе по DOI: {response.status_code}")
+        raise Exception(f"Ошибка при переходе по DOI (код: {response.status_code})")
 
     final_url = response.url
-    domain = urlparse(final_url).netloc
+    domain = urlparse(final_url).netloc.lower()
+
+    print(f"[DEBUG] DOI: {doi}")
+    print(f"[DEBUG] Redirected URL: {final_url}")
+    print(f"[DEBUG] Domain parsed: {domain}")
+    print(f"[DEBUG] Known domains: {list(SITES.keys())}")
 
     if domain in SITES:
-        # Вызов нужного парсера
         try:
-            parsed = SITES[domain](final_url)
-            parsed.update({
-                "doi": doi,
-                "url": final_url
-            })
-            return parsed
-        except Exception as e:
-            raise Exception(f"Ошибка при парсинге {domain}: {str(e)}")
-    else:
-        raise Exception(f"❌ Неизвестный домен ({domain}). Поддерживаются только: {', '.join(SITES.keys())}")
+            parsed = SITES[domain]()
