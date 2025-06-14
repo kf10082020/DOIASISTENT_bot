@@ -1,6 +1,7 @@
 python-telegram-bot
+python-dotenv
 aiohttp
 beautifulsoup4
 requests
 openai
-python-dotenv
+
