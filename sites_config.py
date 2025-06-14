@@ -1,23 +1,26 @@
-def parse_mdpi(url): return {"title": "MDPI parser", "authors": "—", "journal": "MDPI", "issued": "—"}
-def parse_springer(url): return {"title": "Springer parser", "authors": "—", "journal": "Springer", "issued": "—"}
-def parse_sciencedirect(url): return {"title": "Sciencedirect parser", "authors": "—", "journal": "Sciencedirect", "issued": "—"}
-def parse_sagepub(url): return {"title": "Sagepub parser", "authors": "—", "journal": "Sagepub", "issued": "—"}
-def parse_tandfonline(url): return {"title": "Tandfonline parser", "authors": "—", "journal": "Tandfonline", "issued": "—"}
-def parse_bmcmedicine(url): return {"title": "Bmcmedicine parser" "authors": "—", "journal": "Bmcmedicine", "issued": "—"}
-def parse_frontiersin(url): return {"title": "Frontiersin parser", "authors": "—", "journal": "Frontiersin", "issued": "—"}
-def parse_routledge(url): return {"title": "Routledge parser", "authors": "—", "journal": "Routledge", "issued": "—"}
-def parse_wiley(url): return {"title": "wiley parser", "authors": "—", "journal": "wiley", "issued": "—"}
-def parse_jstor(url): return {"title": "jstor parser", "authors": "—", "journal": "jstor", "issued": "—"}
-def parse_muse(url): return {"title": "Muse parser", "authors": "—", "journal": "Muse", "issued": "—"}
-def parse_crossref(url): return {"title": "crossref parser", "authors": "—", "journal": "crossref", "issued": "—"}
-def parse_scholar(url): return {"title": "scholar parser", "authors": "—", "journal": "scholar", "issued": "—"}
-def parse_doaj(url): return {"title": "Doaj parser", "authors": "—", "journal": "Doaj", "issued": "—"}
-def parse_pubmed(url): return {"title": "Pubmed parser", "authors": "—", "journal": "Pubmed", "issued": "—"}
-def parse_ijirmf(url): return {"title": "Ijirmf parser", "authors": "—", "journal": "Ijirmf", "issued": "—"}
-def parse_eric(url): return {"title": "Eric parser", "authors": "—", "journal": "Eric", "issued": "—"}
-def parse_ieee(url): return {"title": "Ieee parser", "authors": "—", "journal": "Ieee", "issued": "—"}
-def parse_acm(url): return {"title": "acm parser", "authors": "—", "journal": "acm", "issued": "—"}
-def parse_ssrn(url): return {"title": "ssrn parser", "authors": "—", "journal": "ssrn", "issued": "—"}
+def get_placeholder(name):
+    return f"{name} parser"
+
+def parse_mdpi(url): return {"title": get_placeholder("MDPI"), "authors": "—", "journal": "MDPI", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_springer(url): return {"title": get_placeholder("Springer"), "authors": "—", "journal": "Springer", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_sciencedirect(url): return {"title": get_placeholder("Sciencedirect"), "authors": "—", "journal": "Sciencedirect", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_sagepub(url): return {"title": get_placeholder("Sagepub"), "authors": "—", "journal": "Sagepub", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_tandfonline(url): return {"title": get_placeholder("Tandfonline"), "authors": "—", "journal": "Tandfonline", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_bmcmedicine(url): return {"title": get_placeholder("Bmcmedicine"), "authors": "—", "journal": "Bmcmedicine", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_frontiersin(url): return {"title": get_placeholder("Frontiersin"), "authors": "—", "journal": "Frontiersin", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_routledge(url): return {"title": get_placeholder("Routledge"), "authors": "—", "journal": "Routledge", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_wiley(url): return {"title": get_placeholder("Wiley"), "authors": "—", "journal": "Wiley", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_jstor(url): return {"title": get_placeholder("Jstor"), "authors": "—", "journal": "Jstor", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_muse(url): return {"title": get_placeholder("Muse"), "authors": "—", "journal": "Muse", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_crossref(url): return {"title": get_placeholder("Crossref"), "authors": "—", "journal": "Crossref", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_scholar(url): return {"title": get_placeholder("Scholar"), "authors": "—", "journal": "Scholar", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_doaj(url): return {"title": get_placeholder("Doaj"), "authors": "—", "journal": "Doaj", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_pubmed(url): return {"title": get_placeholder("Pubmed"), "authors": "—", "journal": "Pubmed", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_ijirmf(url): return {"title": get_placeholder("Ijirmf"), "authors": "—", "journal": "Ijirmf", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_eric(url): return {"title": get_placeholder("Eric"), "authors": "—", "journal": "Eric", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_ieee(url): return {"title": get_placeholder("IEEE"), "authors": "—", "journal": "IEEE", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_acm(url): return {"title": get_placeholder("ACM"), "authors": "—", "journal": "ACM", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_ssrn(url): return {"title": get_placeholder("SSRN"), "authors": "—", "journal": "SSRN", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
 
 SITES = {
     "www.mdpi.com": parse_mdpi,
