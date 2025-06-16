@@ -1,3 +1,4 @@
 TELEGRAM_BOT_TOKEN=...
 WEBHOOK_URL=https://your-bot-name.up.railway.app
 RAILWAY_ENVIRONMENT=production
+OPENAI_API_KEY=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
