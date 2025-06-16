@@ -1,44 +1,47 @@
+
 def get_placeholder(name):
     return f"{name} parser"
 
-def create_parser_journal(journal_name):
-    def parser(url):
-        return {
-            "title": get_placeholder(journal_name),
-            "authors": "—",
-            "journal": journal_name,
-            "issued": "—",
-            "volume": "—",
-            "issue": "—",
-            "pages": "—",
-            "abstract": "—",
-            "conclusion": "—",
-            "suggestions": "—",
-            "pdf_url": "—",
-            "doi": "—",
-            "url": url
-        }
-    return parser
+def parse_mdpi(url): return {"title": get_placeholder("MDPI"), "authors": "—", "journal": "MDPI", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_springer(url): return {"title": get_placeholder("Springer"), "authors": "—", "journal": "Springer", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_sciencedirect(url): return {"title": get_placeholder("Sciencedirect"), "authors": "—", "journal": "Sciencedirect", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_sagepub(url): return {"title": get_placeholder("Sagepub"), "authors": "—", "journal": "Sagepub", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_tandfonline(url): return {"title": get_placeholder("Tandfonline"), "authors": "—", "journal": "Tandfonline", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_bmcmedicine(url): return {"title": get_placeholder("Bmcmedicine"), "authors": "—", "journal": "Bmcmedicine", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_frontiersin(url): return {"title": get_placeholder("Frontiersin"), "authors": "—", "journal": "Frontiersin", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_routledge(url): return {"title": get_placeholder("Routledge"), "authors": "—", "journal": "Routledge", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_wiley(url): return {"title": get_placeholder("Wiley"), "authors": "—", "journal": "Wiley", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_jstor(url): return {"title": get_placeholder("Jstor"), "authors": "—", "journal": "Jstor", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_muse(url): return {"title": get_placeholder("Muse"), "authors": "—", "journal": "Muse", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_crossref(url): return {"title": get_placeholder("Crossref"), "authors": "—", "journal": "Crossref", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_scholar(url): return {"title": get_placeholder("Scholar"), "authors": "—", "journal": "Scholar", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_doaj(url): return {"title": get_placeholder("Doaj"), "authors": "—", "journal": "Doaj", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_pubmed(url): return {"title": get_placeholder("Pubmed"), "authors": "—", "journal": "Pubmed", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_ijirmf(url): return {"title": get_placeholder("Ijirmf"), "authors": "—", "journal": "Ijirmf", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_eric(url): return {"title": get_placeholder("Eric"), "authors": "—", "journal": "Eric", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_ieee(url): return {"title": get_placeholder("IEEE"), "authors": "—", "journal": "IEEE", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_acm(url): return {"title": get_placeholder("ACM"), "authors": "—", "journal": "ACM", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
+def parse_ssrn(url): return {"title": get_placeholder("SSRN"), "authors": "—", "journal": "SSRN", "issued": "—", "volume": "—", "issue": "—", "pages": "—", "abstract": "—", "conclusion": "—", "suggestions": "—", "pdf_url": "—", "doi": "—", "url": url}
 
 SITES = {
-    "www.mdpi.com": create_parser_journal("MDPI"),
-    "link.springer.com": create_parser_journal("Springer"),
-    "www.sciencedirect.com": create_parser_journal("Sciencedirect"),
-    "journals.sagepub.com": create_parser_journal("Sagepub"),
-    "www.tandfonline.com": create_parser_journal("Tandfonline"),
-    "bmcmedicine.biomedcentral.com": create_parser_journal("Bmcmedicine"),
-    "www.frontiersin.org": create_parser_journal("Frontiersin"),
-    "www.routledge.com": create_parser_journal("Routledge"),
-    "onlinelibrary.wiley.com": create_parser_journal("Wiley"),
-    "www.jstor.org": create_parser_journal("Jstor"),
-    "muse.jhu.edu": create_parser_journal("Muse"),
-    "search.crossref.org": create_parser_journal("Crossref"),
-    "scholar.google.com": create_parser_journal("Scholar"),
-    "doaj.org": create_parser_journal("Doaj"),
-    "pubmed.ncbi.nlm.nih.gov": create_parser_journal("Pubmed"),
-    "www.ijirmf.com": create_parser_journal("Ijirmf"),
-    "eric.ed.gov": create_parser_journal("Eric"),
-    "ieeexplore.ieee.org": create_parser_journal("IEEE"),
-    "dl.acm.org": create_parser_journal("ACM"),
-    "www.ssrn.com": create_parser_journal("SSRN")
+    "www.mdpi.com": parse_mdpi,
+    "link.springer.com": parse_springer,
+    "www.sciencedirect.com": parse_sciencedirect,
+    "journals.sagepub.com": parse_sagepub,
+    "www.tandfonline.com": parse_tandfonline,
+    "bmcmedicine.biomedcentral.com": parse_bmcmedicine,
+    "www.frontiersin.org": parse_frontiersin,
+    "www.routledge.com": parse_routledge,
+    "onlinelibrary.wiley.com": parse_wiley,
+    "www.jstor.org": parse_jstor,
+    "muse.jhu.edu": parse_muse,
+    "search.crossref.org": parse_crossref,
+    "scholar.google.com": parse_scholar,
+    "doaj.org": parse_doaj,
+    "pubmed.ncbi.nlm.nih.gov": parse_pubmed,
+    "www.ijirmf.com": parse_ijirmf,
+    "eric.ed.gov": parse_eric,
+    "ieeexplore.ieee.org": parse_ieee,
+    "dl.acm.org": parse_acm,
+    "www.ssrn.com": parse_ssrn
 }
