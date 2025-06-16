@@ -1,20 +1,27 @@
 import os
-from telegram.ext import ApplicationBuilder
-
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters
 from handlers import publication_handler, publication_confirm_handler
 
-app = ApplicationBuilder().token(os.getenv("TELEGRAM_BOT_TOKEN")).build()
+TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+WEBHOOK_URL = os.getenv("WEBHOOK_URL")
+RAILWAY_ENVIRONMENT = os.getenv("RAILWAY_ENVIRONMENT")
 
+app = ApplicationBuilder().token(TOKEN).build()
+
+# Подключение всех обработчиков
 app.add_handler(CommandHandler("start", publication_handler.start))
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, publication_handler.handle_text))
-for h in publication_confirm_handler.get_handlers():
-    app.add_handler(h)
+for handler in publication_confirm_handler.get_handlers():
+    app.add_handler(handler)
 
-if os.getenv("RAILWAY_ENVIRONMENT") == "production":
+# Выбор режима запуска
+if RAILWAY_ENVIRONMENT == "production":
+    print("🚀 Запуск в режиме webhook (Railway)")
     app.run_webhook(
         listen="0.0.0.0",
         port=int(os.environ.get("PORT", 8443)),
-        webhook_url=os.getenv("WEBHOOK_URL")
+        webhook_url=WEBHOOK_URL
     )
 else:
+    print("💻 Локальный запуск в режиме polling")
     app.run_polling()
