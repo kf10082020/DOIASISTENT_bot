@@ -2,42 +2,36 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, InputFi
 from telegram.ext import ContextTypes, CallbackQueryHandler
 import os
 
-# Отправка черновика пользователю
-async def send_draft(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    draft_path = "templates/sample_generated_article.docx"
-    if not os.path.exists(draft_path):
-        await update.callback_query.message.reply_text("?? Черновик пока не сгенерирован.")
-        return
-
-    await update.callback_query.message.reply_document(
-        document=InputFile(draft_path),
-        caption="?? Черновик вашей статьи. Проверьте его перед публикацией.",
-        reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton("? Я проверил, всё верно", callback_data="confirm_ready")]
-        ])
-    )
-
-# Подтверждение готовности к публикации
-async def confirm_ready_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+# РћС‚РїСЂР°РІРєР° С‡РµСЂРЅРѕРІРёРєР°
+async def send_docx(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-    await query.edit_message_text(
-        "?? Подтверждено. Статья готова к публикации.",
-        reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton("?? Опубликовать статью", callback_data="final_publish")]
-        ])
-    )
 
-# Финальный этап — публикация (заглушка)
-async def final_publish_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    await query.answer()
-    await query.edit_message_text("? Статья опубликована! (эмуляция действия)")
+    try:
+        # РџСѓС‚СЊ Рє .docx РїРµСЂРµРґР°С‘С‚СЃСЏ РІ callback_data: send_docx|РїСѓС‚СЊ
+        path = query.data.split("|")[1]
+        await query.message.reply_document(
+            document=InputFile(path),
+            filename=os.path.basename(path),
+            caption="рџ“Ћ Р’РѕС‚ РІР°С€ СЃРіРµРЅРµСЂРёСЂРѕРІР°РЅРЅС‹Р№ С‡РµСЂРЅРѕРІРёРє."
+        )
+    except Exception as e:
+        await query.message.reply_text(f"вљ пёЏ РћС€РёР±РєР° РїСЂРё РѕС‚РїСЂР°РІРєРµ С„Р°Р№Р»Р°: {e}")
 
-# Подключение обработчиков
+# Р—Р°РіР»СѓС€РєР° РґР»СЏ Р°РЅР°Р»РёР·Р°
+async def analyze_article(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.callback_query.answer()
+    await update.callback_query.message.reply_text("рџ§  GPT-Р°РЅР°Р»РёР· РїРѕРєР° РЅРµ РїРѕРґРєР»СЋС‡С‘РЅ. Р‘СѓРґРµС‚ РґРѕСЃС‚СѓРїРµРЅ СЃРєРѕСЂРѕ!")
+
+# Р—Р°РіР»СѓС€РєР° РґР»СЏ РїСѓР±Р»РёРєР°С†РёРё
+async def publish_article(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.callback_query.answer()
+    await update.callback_query.message.reply_text("рџ“¤ РЎС‚Р°С‚СЊСЏ РѕРїСѓР±Р»РёРєРѕРІР°РЅР°! (СЌРјСѓР»СЏС†РёСЏ)")
+
+# Р РµРіРёСЃС‚СЂР°С†РёСЏ РІСЃРµС… РєРЅРѕРїРѕРє
 def get_handlers():
     return [
-        CallbackQueryHandler(send_draft, pattern="^send_draft$"),
-        CallbackQueryHandler(confirm_ready_callback, pattern="^confirm_ready$"),
-        CallbackQueryHandler(final_publish_callback, pattern="^final_publish$")
+        CallbackQueryHandler(send_docx, pattern="^send_docx"),
+        CallbackQueryHandler(analyze_article, pattern="^analyze_article$"),
+        CallbackQueryHandler(publish_article, pattern="^publish_article$")
     ]
