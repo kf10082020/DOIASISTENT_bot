@@ -1,6 +1,9 @@
 import os
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters
-from handlers import publication_handler, publication_confirm_handler
+
+# ✅ Прямой импорт обработчиков
+import publication_handler
+import publication_confirm_handler
 
 # ✅ Загрузка переменных окружения
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -24,7 +27,7 @@ app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, publication_hand
 for handler in publication_confirm_handler.get_handlers():
     app.add_handler(handler)
 
-# ✅ Выбор режима
+# ✅ Выбор режима запуска
 if RAILWAY_ENVIRONMENT == "production":
     print("🚀 Webhook запуск (Railway)")
     app.run_webhook(
