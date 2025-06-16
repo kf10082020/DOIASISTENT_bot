@@ -7,13 +7,13 @@ TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 RAILWAY_ENVIRONMENT = os.getenv("RAILWAY_ENVIRONMENT")
 
-# Проверка наличия ключей
+# Проверка ключевых переменных
 if not TOKEN:
     raise RuntimeError("❌ Ошибка: TELEGRAM_BOT_TOKEN не установлен в переменных окружения.")
 if RAILWAY_ENVIRONMENT == "production" and not WEBHOOK_URL:
     raise RuntimeError("❌ Ошибка: WEBHOOK_URL не установлен для Railway среды.")
 
-# Инициализация приложения
+# Инициализация Telegram-приложения
 app = ApplicationBuilder().token(TOKEN).build()
 
 # Подключение всех обработчиков
