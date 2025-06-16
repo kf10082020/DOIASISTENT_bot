@@ -1,22 +1,25 @@
+import requests
+from bs4 import BeautifulSoup
+
 def parse_springer(url):
-    """Реальный парсер для Springer"""
     try:
-        response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
+        headers = {'User-Agent': 'Mozilla/5.0'}
+        response = requests.get(url, headers=headers)
         soup = BeautifulSoup(response.text, 'html.parser')
         
         return {
-            "title": soup.find('h1', {'class': 'c-article-title'}).text.strip(),
-            "authors": [a.text.strip() for a in soup.select('.c-article-author-list__item a')],
-            "journal": soup.find('a', {'data-test': 'journal-title'}).text.strip(),
-            "issued": soup.find('time')['datetime'].split('-')[0],
-            "volume": soup.find('b', {'data-test': 'journal-volume'}).text.strip(),
-            "issue": soup.find('b', {'data-test': 'journal-issue'}).text.strip(),
-            "pages": soup.find('span', {'data-test': 'article-page-range'}).text.strip(),
-            "abstract": soup.find('section', {'id': 'Abs1'}).text.strip(),
-            "pdf_url": f"https://link.springer.com{soup.find('a', {'data-test': 'pdf-link'})['href']}",
-            "doi": url.split('doi.org/')[-1],
-            "url": url
+            "title": soup.find('h1').get_text(strip=True),
+            "authors": [a.get_text(strip=True) 
+                       for a in soup.select('.authors__name')],
+            "journal": soup.select_one('.journal-title').get_text(strip=True),
+            "issued": soup.select_one('.ArticleCitation_Year').get_text(strip=True),
+            "volume": soup.select_one('.ArticleCitation_Volume').get_text(strip=True),
+            "issue": soup.select_one('.ArticleCitation_Issue').get_text(strip=True),
+            "pages": soup.select_one('.ArticleCitation_Pages').get_text(strip=True),
+            "abstract": soup.select_one('.Abstract').get_text(strip=True),
+            "pdf_url": f"https://link.springer.com{soup.select_one('.pdf-link')['href']}",
+            "doi": url.split('doi.org/')[-1]
         }
     except Exception as e:
         print(f"Springer parser error: {e}")
-        return get_placeholder("Springer")(url)
+        return {"error": "❌ Не удалось обработать статью Springer"}
