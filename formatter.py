@@ -1,36 +1,15 @@
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-
-def format_reply(data):
-    if "error" in data:
-        return data["error"], None
-
-    text = f"""📘 *Название:* {data.get('title', '—')}
-👨‍🔬 *Авторы:* {data.get('authors', '—')}
-📅 *Год:* {data.get('issued', '—')}
-📚 *Журнал:* {data.get('journal', '—')}
-📦 *Том:* {data.get('volume', '—')}
-📎 *Выпуск:* {data.get('issue', '—')}
-📄 *Страницы:* {data.get('pages', '—')}
-
-📝 *Аннотация:*
-{data.get('abstract', 'Нет аннотации')}
-
-✅ *Выводы:*
-{data.get('conclusion', '—')}
-
-💡 *Предложения:*
-{data.get('suggestions', '—')}
-"""
-
-    # Кнопки
-    buttons = []
-    if data.get("pdf_url"):
-        buttons.append([
-            InlineKeyboardButton("📥 Скачать PDF", url=data["pdf_url"])
-        ])
-    buttons.append([
-        InlineKeyboardButton("🚀 Опубликовать труд", url="https://yourpublicationform.com")  # можно заменить на webhook
-    ])
-
-    keyboard = InlineKeyboardMarkup(buttons)
-    return text, keyboard
+def format_metadata(metadata: dict) -> str:
+    return (
+        f"📘 *Название:* {metadata.get('title', '—')}\n"
+        f"👨‍🔬 *Авторы:* {metadata.get('authors', '—')}\n"
+        f"📚 *Журнал:* {metadata.get('journal', '—')}\n"
+        f"📅 *Год:* {metadata.get('issued', '—')}\n"
+        f"📦 *Том:* {metadata.get('volume', '—')}  №{metadata.get('issue', '—')}\n"
+        f"📄 *Страницы:* {metadata.get('pages', '—')}\n\n"
+        f"📝 *Аннотация:*\n{metadata.get('abstract', '—')}\n\n"
+        f"🔚 *Выводы:*\n{metadata.get('conclusion', '—')}\n\n"
+        f"💡 *Предложения:*\n{metadata.get('suggestions', '—')}\n\n"
+        f"📥 *PDF:* {metadata.get('pdf_url', 'Нет')}\n"
+        f"🔗 *DOI:* {metadata.get('doi', '—')}\n"
+        f"🌐 *Источник:* {metadata.get('url', '—')}"
+    )
