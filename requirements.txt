@@ -1,6 +1,5 @@
-python-telegram-bot
+python-telegram-bot>=20.0
 python-dotenv
-pyTelegramBotAPI
 aiohttp
 beautifulsoup4
 requests
