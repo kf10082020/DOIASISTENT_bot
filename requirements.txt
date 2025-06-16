@@ -1,6 +1,6 @@
 python-telegram-bot>=20.0
 python-dotenv
 aiohttp
-beautifulsoup4
-requests
+requests>=2.25.0
+beautifulsoup4>=4.9.0
 openai
