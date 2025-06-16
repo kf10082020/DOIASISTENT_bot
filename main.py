@@ -15,18 +15,18 @@ from formatter import format_reply
 from utils import extract_doi
 
 # Настройка логов
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
 logger = logging.getLogger(__name__)
 
-# Загрузка токена
-TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-
-# Команда /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Обработчик команды /start"""
     await update.message.reply_text("👋 День добрый! Отправь DOI-ссылку, и я найду данные публикации.")
 
-# Обработка текстовых сообщений
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Обработчик текстовых сообщений"""
     text = update.message.text.strip()
     doi = extract_doi(text)
 
@@ -36,29 +36,39 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text("⌛ Обрабатываю запрос, подождите...")
 
-    metadata = handle_doi(doi)
-    reply = format_reply(metadata)
+    metadata = handle_doi(text)  # Передаем полный текст, так как handle_doi сам разберет DOI
+    reply_text, keyboard = format_reply(metadata)
+    
+    await update.message.reply_text(
+        reply_text,
+        parse_mode="Markdown",
+        reply_markup=keyboard,
+        disable_web_page_preview=True
+    )
 
-    keyboard = [
-        [InlineKeyboardButton("📥 Скачать PDF", url=metadata.get("pdf", "#"))],
-        [InlineKeyboardButton("📤 Опубликовать труд", callback_data="publish_request")]
-    ]
-    await update.message.reply_text(reply, parse_mode="Markdown", reply_markup=InlineKeyboardMarkup(keyboard))
-
-# Обработка нажатий на кнопки
 async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Обработчик нажатий на кнопки"""
     query = update.callback_query
     await query.answer()
 
     if query.data == "publish_request":
-        await query.edit_message_reply_markup()  # удалить кнопки
+        await query.edit_message_reply_markup()
         await query.message.reply_text("✅ Запрос на публикацию принят. Мы свяжемся с вами позже.")
 
-# Запуск приложения
-app = ApplicationBuilder().token(TOKEN).build()
-app.add_handler(CommandHandler("start", start))
-app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-app.add_handler(CallbackQueryHandler(handle_callback))
+def main():
+    """Запуск бота"""
+    TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+    if not TOKEN:
+        raise ValueError("❌ TELEGRAM_BOT_TOKEN не установлен в переменных окружения")
+
+    app = ApplicationBuilder().token(TOKEN).build()
+    
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    app.add_handler(CallbackQueryHandler(handle_callback))
+    
+    logger.info("Бот запущен...")
+    app.run_polling()
 
 if __name__ == "__main__":
-    app.run_polling()
+    main()
