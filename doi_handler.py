@@ -1,52 +1,48 @@
-from urllib.parse import urlparse
 import requests
+from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 from sites_config import SITES
 
-def fetch_real_metadata(doi_url):
-    """Получение реальных метаданных через Crossref API"""
+def fetch_crossref_metadata(doi):
     try:
-        if doi_url.startswith('10.'):
-            doi_url = f"https://doi.org/{doi_url}"
-        
-        # Проверяем, это DOI или прямой URL
-        if 'doi.org' in doi_url:
-            doi = doi_url.split('doi.org/')[-1]
-            url = f"https://api.crossref.org/works/{doi}"
-            response = requests.get(url)
-            response.raise_for_status()
-            return response.json()['message']
-        else:
-            # Для прямых URL используем парсеры из sites_config
-            domain = urlparse(doi_url).netloc.replace("www.", "")
-            parser = SITES.get(domain)
-            if parser:
-                return parser(doi_url)
-            return None
+        url = f"https://api.crossref.org/works/{doi}"
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        return response.json()['message']
     except Exception as e:
-        print(f"Error fetching metadata: {e}")
+        print(f"Crossref error: {e}")
         return None
 
-def handle_doi(doi_url):
-    """Основная функция обработки DOI/URL"""
+def handle_doi(input_text):
     try:
-        # Получаем реальные метаданные
-        data = fetch_real_metadata(doi_url)
-        if not data:
-            return {"error": "❌ Не удалось получить данные статьи"}
+        # Если это DOI (начинается с 10.)
+        if input_text.startswith('10.'):
+            metadata = fetch_crossref_metadata(input_text)
+            if not metadata:
+                return {"error": "❌ Не удалось получить данные по этому DOI"}
             
-        # Стандартизируем структуру данных
-        return {
-            "title": data.get("title", "Название не указано"),
-            "authors": data.get("author", []),
-            "issued": data.get("created", {}).get("date-parts", [[""]])[0][0],
-            "journal": data.get("container-title", [""])[0],
-            "volume": data.get("volume", ""),
-            "issue": data.get("issue", ""),
-            "pages": data.get("page", ""),
-            "abstract": data.get("abstract", "Аннотация недоступна"),
-            "pdf_url": data.get("link", [{}])[0].get("URL", ""),
-            "doi": doi_url if doi_url.startswith('10.') else ""
-        }
+            return {
+                "title": ' '.join(metadata.get('title', ['Название не указано'])),
+                "authors": [f"{a.get('given', '')} {a.get('family', '')}".strip() 
+                           for a in metadata.get('author', [])],
+                "issued": metadata.get('created', {}).get('date-parts', [[None]])[0][0],
+                "journal": ' '.join(metadata.get('container-title', ['Журнал не указан'])),
+                "volume": metadata.get('volume'),
+                "issue": metadata.get('issue'),
+                "pages": metadata.get('page'),
+                "abstract": metadata.get('abstract', 'Аннотация недоступна'),
+                "pdf_url": metadata.get('link', [{}])[0].get('URL'),
+                "doi": input_text
+            }
+        
+        # Если это URL
+        domain = urlparse(input_text).netloc.replace("www.", "")
+        parser = SITES.get(domain)
+        
+        if parser:
+            return parser(input_text)
+            
+        return {"error": f"❌ Этот сайт пока не поддерживается: {domain}"}
+        
     except Exception as e:
-        return {"error": f"⚠️ Ошибка обработки: {str(e)}"}
+        return {"error": f"⚠️ Ошибка: {str(e)}"}
