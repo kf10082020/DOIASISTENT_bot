@@ -2,18 +2,18 @@ from docx import Document
 
 def generate_docx(metadata: dict, output_path: str):
     doc = Document()
-    doc.add_heading(metadata.get("title", "—"), level=1)
-    doc.add_paragraph(f'Àâòîğû: {metadata.get("authors", "—")}')
-    doc.add_paragraph(f'Æóğíàë: {metadata.get("journal", "—")} ({metadata.get("issued", "—")})')
-    doc.add_paragraph(f'Òîì: {metadata.get("volume", "—")}  ¹{metadata.get("issue", "—")} ñòğ. {metadata.get("pages", "—")}')
+    doc.add_heading(metadata.get("title", "â€”"), level=1)
+    doc.add_paragraph(f'Aaoi?u: {metadata.get("authors", "â€”")}')
+    doc.add_paragraph(f'?o?iae: {metadata.get("journal", "â€”")} ({metadata.get("issued", "â€”")})')
+    doc.add_paragraph(f'Oii: {metadata.get("volume", "â€”")}  ?{metadata.get("issue", "â€”")} no?. {metadata.get("pages", "â€”")}')
 
-    doc.add_heading("Àííîòàöèÿ", level=2)
-    doc.add_paragraph(metadata.get("abstract", "—"))
+    doc.add_heading("Aiiioaoey", level=2)
+    doc.add_paragraph(metadata.get("abstract", "â€”"))
 
-    doc.add_heading("Âûâîäû", level=2)
-    doc.add_paragraph(metadata.get("conclusion", "—"))
+    doc.add_heading("Auaiau", level=2)
+    doc.add_paragraph(metadata.get("conclusion", "â€”"))
 
-    doc.add_heading("Ïğåäëîæåíèÿ", level=2)
-    doc.add_paragraph(metadata.get("suggestions", "—"))
+    doc.add_heading("I?aaei?aiey", level=2)
+    doc.add_paragraph(metadata.get("suggestions", "â€”"))
 
     doc.save(output_path)
